@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json
 from typing import Optional
 from sys import maxsize
 
@@ -9,6 +10,7 @@ Weight = int
 TimeTable = list[list[Time]]
 
 
+@dataclass_json
 @dataclass
 class TimeWindow:
     start: Time
@@ -18,6 +20,7 @@ class TimeWindow:
 TimeWindows = dict[int, TimeWindow]
 
 
+@dataclass_json
 @dataclass
 class Problem:
     tripTimeTable: TimeTable = field(default_factory=lambda: [[0]])
