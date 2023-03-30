@@ -1,6 +1,6 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
-from .problem import Cost, Problem, Time, TimeTable, TimeWindow, TimeWindows, Weight
+from .problem import *
 from sys import maxsize
 
 
@@ -27,6 +27,9 @@ class RoutingModel:
 
         self.__setTimeWindows(problem.timeWindows, self.__getLatenessPenalty(tripTimeTable))
         self.__setStartTime(problem.startTime, problem.depot, problem.timeWindows)
+
+        if problem.pickupDeliveries is not None:
+            self.__setPickupsAndDeliveries(problem.pickupDeliveries)
 
         self.__setVehicleFixedCost(problem.vehicleFixedCost)
 
@@ -95,6 +98,23 @@ class RoutingModel:
                 self.timeDimension.CumulVar(self.orToolsModel.End(i)))
             self.orToolsModel.AddVariableMaximizedByFinalizer(
                 self.timeDimension.CumulVar(self.orToolsModel.Start(i)))
+
+
+    def __setPickupsAndDeliveries(self, pickupDeliveries: list[Node]):
+        for pickupDelivery in pickupDeliveries:
+            pickup_index = self.indexManager.NodeToIndex(pickupDelivery['pickup'])
+            delivery_index = self.indexManager.NodeToIndex(pickupDelivery['delivery'])
+            self.orToolsModel.AddPickupAndDelivery(pickup_index, delivery_index)
+
+            self.orToolsModel.solver().Add(
+                self.orToolsModel.VehicleVar(pickup_index)
+                == self.orToolsModel.VehicleVar(delivery_index)
+            )
+
+            self.orToolsModel.solver().Add(
+                self.timeDimension.CumulVar(pickup_index)
+                <= self.timeDimension.CumulVar(delivery_index)
+            )
 
 
     def __registerDemandCallback(self, demands: list[Weight]):

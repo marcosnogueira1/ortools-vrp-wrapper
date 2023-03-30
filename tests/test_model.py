@@ -14,6 +14,16 @@ class TestModel(unittest.TestCase):
         self.assertListEqual([[0, 3, 7]], list(solution.getTimes().values()))
 
 
+    def test_basic_problem_with_pickup_and_delivery(self):
+        problem = Problem(
+            aTableWithStraightSolution(),
+            [{'pickup': 2, 'delivery': 1}]
+        )
+        routingModel = RoutingModel(problem)
+        solution = Solution(problem, routingModel).solve()
+        self.assertListEqual([[0, 2, 1]], list(solution.getTrips().values()))
+
+
     def test_rather_large_problem(self):
         problem = Problem(aRatherLargeTripTimeTable())
         routingModel = RoutingModel(problem)

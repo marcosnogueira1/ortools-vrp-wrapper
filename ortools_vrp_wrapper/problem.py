@@ -8,6 +8,7 @@ Time = int
 Cost = Time
 Weight = int
 TimeTable = list[list[Time]]
+Node = int
 
 
 @dataclass_json
@@ -17,13 +18,21 @@ class TimeWindow:
     end: Time
 
 
-TimeWindows = dict[int, TimeWindow]
+TimeWindows = dict[Node, TimeWindow]
+
+
+@dataclass_json
+@dataclass
+class PickupDelivery:
+    pickup: Node
+    delivery: Node
 
 
 @dataclass_json
 @dataclass
 class Problem:
     tripTimeTable: TimeTable = field(default_factory=lambda: [[0]])
+    pickupDeliveries: Optional[list[PickupDelivery]] = None
     numVehicles: int = 1
     depot: int = 0
     startsAtDepot: bool = True
